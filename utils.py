@@ -25,6 +25,7 @@ def create_logger(logger_nm: str):
     # Add formatter to ch
     ch.setFormatter(formatter)
     # Add ch to logger
+    gen_logger.handlers.clear()
     gen_logger.addHandler(ch)
 
     return gen_logger
