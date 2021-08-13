@@ -428,8 +428,8 @@ function filterTable(elem) { // eslint-disable-line no-unused-vars
     notFoundMessage.hidden = !allRowsHidden;
 }
 </script>
-    <h1>Report.html</h1>
-    <p>Report generated on 10-Aug-2021 at 16:00:48 by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a> v3.1.1</p>
+    <h1>unit_test_results.html</h1>
+    <p>Report generated on 14-Aug-2021 at 02:08:30 by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a> v3.1.1</p>
     <h2>Environment</h2>
     <table id="environment">
       <tr>
@@ -448,7 +448,7 @@ function filterTable(elem) { // eslint-disable-line no-unused-vars
         <td>Python</td>
         <td>3.7.5</td></tr></table>
     <h2>Summary</h2>
-    <p>4 tests ran in 16.18 seconds. </p>
+    <p>4 tests ran in 15.85 seconds. </p>
     <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p><input checked="true" class="filter" data-test-result="passed" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="passed">4 passed</span>, <input checked="true" class="filter" data-test-result="skipped" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="skipped">0 skipped</span>, <input checked="true" class="filter" data-test-result="failed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="failed">0 failed</span>, <input checked="true" class="filter" data-test-result="error" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="error">0 errors</span>, <input checked="true" class="filter" data-test-result="xfailed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xfailed">0 expected failures</span>, <input checked="true" class="filter" data-test-result="xpassed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span>
     <h2>Results</h2>
     <table id="results-table">
@@ -463,56 +463,50 @@ function filterTable(elem) { // eslint-disable-line no-unused-vars
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
-          <td class="col-name">test_find_datacol_diff.py::test_matching_files</td>
+          <td class="col-name">tests/test_find_datacol_diff.py::test_matching_files</td>
           <td class="col-duration">0.13</td>
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="4">
             <div class="log"> ------------------------------Captured stderr call------------------------------ <br/>
-DataColDiff - INFO - 50 - initialise_and_standardise_df - 2021-08-10 16:00:48,503 - The schema matches.Condition Fulfilled.Columns are : {&#x27;id&#x27;, &#x27;email&#x27;, &#x27;first_name&#x27;, &#x27;gender&#x27;, &#x27;ip_address&#x27;, &#x27;emp_join_date&#x27;, &#x27;last_name&#x27;, &#x27;emp_country&#x27;}
+DataColDiff - INFO - 41 - initialise_and_standardise_df - 2021-08-14 02:08:30,509 - The schema matches.Condition Fulfilled.Columns are : {&#x27;ip_address&#x27;, &#x27;emp_join_date&#x27;, &#x27;last_name&#x27;, &#x27;id&#x27;, &#x27;gender&#x27;, &#x27;emp_country&#x27;, &#x27;first_name&#x27;, &#x27;email&#x27;}
 
-DataColDiff - INFO - 55 - initialise_and_standardise_df - 2021-08-10 16:00:48,580 - Schema Renaming Complete.
-<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     DataColDiff:find_datacol_diff.py:50 The schema matches.Condition Fulfilled.Columns are : {&#x27;id&#x27;, &#x27;email&#x27;, &#x27;first_name&#x27;, &#x27;gender&#x27;, &#x27;ip_address&#x27;, &#x27;emp_join_date&#x27;, &#x27;last_name&#x27;, &#x27;emp_country&#x27;}
-INFO     DataColDiff:find_datacol_diff.py:55 Schema Renaming Complete.<br/></div></td></tr></tbody>
+DataColDiff - INFO - 46 - initialise_and_standardise_df - 2021-08-14 02:08:30,587 - Schema Renaming Complete.
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     DataColDiff:find_datacol_diff.py:41 The schema matches.Condition Fulfilled.Columns are : {&#x27;ip_address&#x27;, &#x27;emp_join_date&#x27;, &#x27;last_name&#x27;, &#x27;id&#x27;, &#x27;gender&#x27;, &#x27;emp_country&#x27;, &#x27;first_name&#x27;, &#x27;email&#x27;}
+INFO     DataColDiff:find_datacol_diff.py:46 Schema Renaming Complete.<br/></div></td></tr></tbody>
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
-          <td class="col-name">test_find_datacol_diff.py::test_matching_files_schema</td>
+          <td class="col-name">tests/test_find_datacol_diff.py::test_matching_files_schema</td>
           <td class="col-duration">0.10</td>
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="4">
             <div class="log"> ------------------------------Captured stderr call------------------------------ <br/>
-DataColDiff - INFO - 50 - initialise_and_standardise_df - 2021-08-10 16:00:48,623 - The schema matches.Condition Fulfilled.Columns are : {&#x27;id&#x27;, &#x27;email&#x27;, &#x27;first_name&#x27;, &#x27;gender&#x27;, &#x27;ip_address&#x27;, &#x27;emp_join_date&#x27;, &#x27;last_name&#x27;, &#x27;emp_country&#x27;}
+DataColDiff - INFO - 41 - initialise_and_standardise_df - 2021-08-14 02:08:30,630 - The schema matches.Condition Fulfilled.Columns are : {&#x27;ip_address&#x27;, &#x27;emp_join_date&#x27;, &#x27;last_name&#x27;, &#x27;id&#x27;, &#x27;gender&#x27;, &#x27;emp_country&#x27;, &#x27;first_name&#x27;, &#x27;email&#x27;}
 
-DataColDiff - INFO - 55 - initialise_and_standardise_df - 2021-08-10 16:00:48,689 - Schema Renaming Complete.
-<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     DataColDiff:find_datacol_diff.py:50 The schema matches.Condition Fulfilled.Columns are : {&#x27;id&#x27;, &#x27;email&#x27;, &#x27;first_name&#x27;, &#x27;gender&#x27;, &#x27;ip_address&#x27;, &#x27;emp_join_date&#x27;, &#x27;last_name&#x27;, &#x27;emp_country&#x27;}
-INFO     DataColDiff:find_datacol_diff.py:55 Schema Renaming Complete.<br/></div></td></tr></tbody>
+DataColDiff - INFO - 46 - initialise_and_standardise_df - 2021-08-14 02:08:30,695 - Schema Renaming Complete.
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     DataColDiff:find_datacol_diff.py:41 The schema matches.Condition Fulfilled.Columns are : {&#x27;ip_address&#x27;, &#x27;emp_join_date&#x27;, &#x27;last_name&#x27;, &#x27;id&#x27;, &#x27;gender&#x27;, &#x27;emp_country&#x27;, &#x27;first_name&#x27;, &#x27;email&#x27;}
+INFO     DataColDiff:find_datacol_diff.py:46 Schema Renaming Complete.<br/></div></td></tr></tbody>
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
-          <td class="col-name">test_find_datacol_diff.py::test_unmatched_files</td>
+          <td class="col-name">tests/test_find_datacol_diff.py::test_unmatched_files</td>
           <td class="col-duration">0.00</td>
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="4">
             <div class="log"> ------------------------------Captured stderr call------------------------------ <br/>
-DataColDiff - INFO - 64 - initialise_and_standardise_df - 2021-08-10 16:00:48,693 - Cant Proceed.Schema for the 2 dataframes don&#x27;t match
-<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     DataColDiff:find_datacol_diff.py:64 Cant Proceed.Schema for the 2 dataframes don&#x27;t match<br/></div></td></tr></tbody>
+DataColDiff - INFO - 55 - initialise_and_standardise_df - 2021-08-14 02:08:30,698 - Cant Proceed.Schema for the 2 dataframes don&#x27;t match
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     DataColDiff:find_datacol_diff.py:55 Cant Proceed.Schema for the 2 dataframes don&#x27;t match<br/></div></td></tr></tbody>
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
-          <td class="col-name">test_find_datacol_diff.py::test_join_keys_and_condn</td>
-          <td class="col-duration">0.11</td>
+          <td class="col-name">tests/test_find_datacol_diff.py::test_join_keys_and_comp_cols</td>
+          <td class="col-duration">0.00</td>
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="4">
             <div class="log"> ------------------------------Captured stderr call------------------------------ <br/>
-DataColDiff - INFO - 50 - initialise_and_standardise_df - 2021-08-10 16:00:48,737 - The schema matches.Condition Fulfilled.Columns are : {&#x27;id&#x27;, &#x27;email&#x27;, &#x27;first_name&#x27;, &#x27;gender&#x27;, &#x27;ip_address&#x27;, &#x27;emp_join_date&#x27;, &#x27;last_name&#x27;, &#x27;emp_country&#x27;}
-
-DataColDiff - INFO - 55 - initialise_and_standardise_df - 2021-08-10 16:00:48,802 - Schema Renaming Complete.
-
-DataColDiff - INFO - 81 - create_join_condition - 2021-08-10 16:00:48,812 - Join Condition : [Column&lt;&#x27;(id_s1 = id_s2)&#x27;&gt;, Column&lt;&#x27;(gender_s1 = gender_s2)&#x27;&gt;] ,s1 keys : [&#x27;id_s1&#x27;, &#x27;gender_s1&#x27;],s2 keys : [&#x27;id_s2&#x27;, &#x27;gender_s2&#x27;]
-<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     DataColDiff:find_datacol_diff.py:50 The schema matches.Condition Fulfilled.Columns are : {&#x27;id&#x27;, &#x27;email&#x27;, &#x27;first_name&#x27;, &#x27;gender&#x27;, &#x27;ip_address&#x27;, &#x27;emp_join_date&#x27;, &#x27;last_name&#x27;, &#x27;emp_country&#x27;}
-INFO     DataColDiff:find_datacol_diff.py:55 Schema Renaming Complete.
-INFO     DataColDiff:find_datacol_diff.py:81 Join Condition : [Column&lt;&#x27;(id_s1 = id_s2)&#x27;&gt;, Column&lt;&#x27;(gender_s1 = gender_s2)&#x27;&gt;] ,s1 keys : [&#x27;id_s1&#x27;, &#x27;gender_s1&#x27;],s2 keys : [&#x27;id_s2&#x27;, &#x27;gender_s2&#x27;]<br/></div></td></tr></tbody></table></body></html>
+DataColDiff - INFO - 75 - gen_comp_col - 2021-08-14 02:08:30,700 - s1 keys : [&#x27;id_s1&#x27;, &#x27;gender_s1&#x27;],s2 keys : [&#x27;id_s2&#x27;, &#x27;gender_s2&#x27;],comparision columns : {&#x27;ip_address&#x27;, &#x27;emp_join_date&#x27;, &#x27;last_name&#x27;, &#x27;emp_country&#x27;, &#x27;first_name&#x27;, &#x27;email&#x27;}
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     DataColDiff:find_datacol_diff.py:75 s1 keys : [&#x27;id_s1&#x27;, &#x27;gender_s1&#x27;],s2 keys : [&#x27;id_s2&#x27;, &#x27;gender_s2&#x27;],comparision columns : {&#x27;ip_address&#x27;, &#x27;emp_join_date&#x27;, &#x27;last_name&#x27;, &#x27;emp_country&#x27;, &#x27;first_name&#x27;, &#x27;email&#x27;}<br/></div></td></tr></tbody></table></body></html>

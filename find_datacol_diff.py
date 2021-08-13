@@ -1,7 +1,7 @@
 """Importing all the necessary prerequisite for the datacol diff library"""
 
 import sys
-from typing import Dict, Union, List
+from typing import List, Set
 
 import pandas as pd
 import pyspark.sql.functions as fx
@@ -16,9 +16,9 @@ import utils
 dcd = utils.create_logger("DataColDiff")
 
 
-def initialise_and_standardise_df(s1: DataFrame, s2: DataFrame) -> Union[Dict[str, DataFrame], Dict[str, None]]:
+def initialise_and_standardise_df(s1: DataFrame, s2: DataFrame):
     """
-    Function takes 2 dataframes as input and does the following:
+    Function takes 2 sources as input and does the following:
     a)Verifies if they have the same schema failing which returns Null as value in Dictionary for keys s1,s2
     b)Appends _s1,_s2 to the 1st & 2nd dataframe after converting all Nulls to BlankSpaces.
     c)Returns the new dataframe in a dictionary with keys s1 and s2
@@ -56,105 +56,106 @@ def initialise_and_standardise_df(s1: DataFrame, s2: DataFrame) -> Union[Dict[st
     return {"s1": None, "s2": None}
 
 
-def create_join_condition(s1: DataFrame, s2: DataFrame, pk_lst):
+def gen_comp_col(org_src: DataFrame, pk_lst: List):
     """
-    Takes 2 dataframes for comparison & List of Primary keys, returns the join condition and key list for the 2 sources
+    Takes any 1 source for comparison,Primary keys,returns renamed key list for 2 sources,and comparison columns
     :param s1: Source 1 Dataframe for comparison
-    :param s2: Source 1 Dataframe for comparison
     :param pk_lst: List of Primary keys
-    :return: The join condition , key list for s1 and key list for s2 in tuple
+    :return: The key list for s1 and s2 in tuple,and columns which will be compared against each other
+    """
+    try:
+        # Compute key list for 2 dataframes
+        s1_key_lst = [key + "_s1" for key in pk_lst]
+        s2_key_lst = [key + "_s2" for key in pk_lst]
+        # Find Original column names
+        org_col = set(org_src.schema.names)
+        # Find columns to compare which are original columns except primary key
+        comp_col: Set[str] = org_col - set(pk_lst)
+
+        dcd.info(f"s1 keys : {s1_key_lst},s2 keys : {s2_key_lst},comparision columns : {comp_col}")
+    except Exception as exc:
+        # Handle exceptions and return None as values in the dictionary for both s1,s2
+        dcd.error(utils.err_msg(lineno=sys.exc_info()[-1].tb_lineno, exception_object=exc))
+        sys.exit(1)
+    return s1_key_lst, s2_key_lst, comp_col
+
+
+def find_col_diff(s1_new: DataFrame, s2_new: DataFrame, s1_key_lst: List[str], s2_key_lst: List[str],
+                  comp_col: Set[str]):
     """
 
-    cond = [(s1[key + "_s1"] == s2[key + "_s2"]) for key in pk_lst]
-    s1_key_lst = [key + "_s1" for key in pk_lst]
-    s2_key_lst = [key + "_s2" for key in pk_lst]
+    :param s1_new: 1st Source Dataframe with columns prefixed as _s1
+    :param s2_new: 2nd Source Dataframe with columns prefixed as _s2
+    :param s1_key_lst: Primary Key List for Source s1
+    :param s2_key_lst: Primary Key List for Source s2
+    :param comp_col: Columns to compare between 2 Dataframes
+    :return: Tuple Consisting of Spark Dataframe with Mismatch Information,Pandas Dataframe with Mismatch Counts
+    """
+    try:
+        # Compute Join Condition for 2 dataframes
+        cond = [(s1_new[s1_key] == s2_new[s2_key]) for s1_key, s2_key in zip(s1_key_lst, s2_key_lst)]
+        dcd.info(f"Join Condition : {cond}")
+        # Join the _s1,_s2 dataframes on the join condition
+        s1_jn_s2 = s1_new.join(s2_new, cond, "outer").withColumn("CompColArr", fx.array())
+        # Iterate all the columns and generate json with keys for differing columns
+        for curr_col in comp_col:
+            # Expression to coalesce s2 and s2 column before comparison to avoid hiccups
+            s1_coal_col = fx.coalesce(col(curr_col + "_s1"), fx.lit(""))
+            s2_coal_col = fx.coalesce(col(curr_col + "_s2"), fx.lit(""))
+            # Check equality between 2 columns.Populate 1 for mismatch,0 otherwise
+            s1_jn_s2 = s1_jn_s2.withColumn("column_eq_test", when(s1_coal_col != s2_coal_col, 1).otherwise(0))
+            # Create expressions for keys col_name, col_s1,col_s2 with column name and 2 columns respective values
+            col_name = fx.lit(curr_col).alias("col_name")
+            s1_col = col(curr_col + "_s1").cast(StringType()).alias("s1_value")
+            s2_col = col(curr_col + "_s2").cast(StringType()).alias("s2_value")
+            # Create array structure with appropriate keys defined above and union with existing elements of Array column
+            array_structure = fx.array_union(col("CompColArr"), fx.array(struct(col_name, s1_col, s2_col)))
+            # Define condition to retain original array column or new array column union-ing current differences
+            equality_test_result = when(col("column_eq_test") == 1, array_structure).otherwise(col("CompColArr"))
+            s1_jn_s2 = s1_jn_s2.withColumn("CompColArr", equality_test_result).drop("column_eq_test")
 
-    dcd.info(f"Join Condition : {cond} ,s1 keys : {s1_key_lst},s2 keys : {s2_key_lst}")
+        # Select Primary key and Column Validation Column also making Comparison column blank for Null Keys else Retain
+        comp_tbl_cols = s1_key_lst + s2_key_lst + ["CompColArr"]
+        """
+        The Nulls generated for unmatched records are captured as Column difference in Array column.
+        The value for 1 of the dataframe's column are all captured as Null and appear as False Positive
+        For such records Array Diff column is explicitly initialised as empty array
+        """
+        key_null_check = when(fx.concat(*s1_key_lst).isNull() | fx.concat(*s2_key_lst).isNull(), array([]))
+        s1_jn_s2 = s1_jn_s2.select(comp_tbl_cols).withColumn("CompColArr", key_null_check.otherwise(col("CompColArr")))
 
-    return cond, s1_key_lst, s2_key_lst
+        # Find records missing in s1 and s2 with appropriate flag column
+        s1_jn_s2.persist()
+        only_in_s1 = fx.concat(*s2_key_lst).isNull()
+        only_in_s2 = fx.concat(*s1_key_lst).isNull()
+        no_diff_rec = col("CompColArr") == array([])
+        flag_col_condn = when(only_in_s1, "S1_ONLY").when(only_in_s2, "S2_ONLY").when(no_diff_rec, "NODIFF").otherwise("")
+        s1_jn_s2 = s1_jn_s2.withColumn("Flag", flag_col_condn)
 
+        # Find Counts for each kind of Flag Value
+        only_in_s1_cnt = s1_jn_s2.filter(col("Flag") == "S1_ONLY").count()
+        only_in_s2_cnt = s1_jn_s2.filter(col("Flag") == "S2_ONLY").count()
+        no_diff_cnt = s1_jn_s2.filter(col("Flag") == "NODIFF").count()
+        diff_cnt = s1_jn_s2.filter(col("Flag") == "").count()
 
-def find_col_diff(s1: DataFrame, s2: DataFrame, s1_key_lst: List[str], s2_key_lst: List[str], cond: List[col]):
-    # Find Original column names
-    org_col = set([curr_col.split("_s1")[0] for curr_col in s1.schema.names])
-    # Find Original Primary keys names
-    org_pk = set([curr_col.split("_s1")[0] for curr_col in s1_key_lst])
-    # Find columns to compare which are original columns except primary key
-    comp_col = org_col - org_pk
-    # Join the _s1,_s2 dataframes on the join condition
-    s1_jn_s2 = s1.join(s2, cond, "outer").withColumn("CompColArr", fx.array())
-    # Iterate all the columns and generate json with keys for differing columns
-    for curr_col in comp_col:
-        s1_jn_s2 = s1_jn_s2.withColumn("column_eq_test", when(
-            fx.coalesce(col(curr_col + "_s1"), fx.lit("")) != fx.coalesce(col(curr_col + "_s2"), fx.lit("")),
-            1).otherwise(0))
-        s1_jn_s2 = s1_jn_s2.withColumn("CompColArr", when(fx.col("column_eq_test") == 1,
-                                                          fx.array_union(col("CompColArr"),
-                                                                         fx.array(
-                                                                             struct(fx.lit(curr_col).alias("col_name"),
-                                                                                    col(curr_col + "_s1").cast(
-                                                                                        StringType()).alias("s1_value"),
-                                                                                    col(curr_col + "_s2").cast(
-                                                                                        StringType()).alias(
-                                                                                        "s2_value"))))).otherwise(
-            col("CompColArr")))
+        dcd.info("Comparision Results :")
+        dcd.info(f"S1 COUNT : {s1_new.count()} , S2 COUNT : : {s2_new.count()}")
+        dcd.info(f"S1 ONLY COUNT : {only_in_s1_cnt}, S2 ONLY COUNT : {only_in_s2_cnt}")
+        dcd.info(f"DIFF COUNT : {diff_cnt}, NO DIFF COUNT : {no_diff_cnt} ")
 
-    # Select Primary key and Column Validation Column also making Comparison column blank for Null Keys
-    comp_tbl_cols = s1_key_lst + s2_key_lst + ["CompColArr"]
-    s1_jn_s2 = s1_jn_s2.select(comp_tbl_cols).withColumn("CompColArr",
-                                                         when(fx.concat(*s1_key_lst).isNull(), array([])).otherwise(
-                                                             col("CompColArr"))).withColumn("CompColArr",
-                                                                                            when(fx.concat(
-                                                                                                *s2_key_lst).isNull(),
-                                                                                                 array([])).otherwise(
-                                                                                                col("CompColArr"))) \
-        .drop("column_eq_test")
+        colnm_cnt = {}
+        for curr_col in comp_col:
+            curr_col_cnt = s1_jn_s2.filter(fx.array_contains(fx.col("CompColArr.col_name"), curr_col)).count()
+            colnm_cnt[curr_col] = curr_col_cnt
 
-    # Find records missing in s1 and s2
-    s1_jn_s2.persist()
-    only_in_s1 = s1_jn_s2.filter(fx.concat(*s2_key_lst).isNull()).select(*s1_key_lst)
-    only_in_s2 = s1_jn_s2.filter(fx.concat(*s1_key_lst).isNull()).select(*s2_key_lst)
-    col_diff_rec = s1_jn_s2.filter(fx.concat(*s1_key_lst).isNotNull() & fx.concat(*s2_key_lst).isNotNull())
+        # Sort the Dictionary from columns having highest mismatch to lowest and create a dataframe
+        colnm_cnt_lst = list(colnm_cnt.items())
+        col_stats = pd.DataFrame(colnm_cnt_lst, columns=['ColName', 'Count']).sort_values(by='Count', ascending=False)
 
-    dcd.info("Column Comparison Complete.Find Count results below :")
-    dcd.info(f"s1 : {s1.count()} , s2 : {s2.count()}")
-    dcd.info(
-        f"only_in_s1 : {only_in_s1.count()} , only_in_s2 : {only_in_s2.count()} , col_diff_rec : {col_diff_rec.count()} ")
-
-    return {"s1_only": only_in_s1, "s2_only": only_in_s2, "attrib_diff": col_diff_rec}
-
-
-def col_mismatch_counts(s1: DataFrame, col_diff_rec: DataFrame):
-    # Find Original column names
-    org_col = set([curr_col.split("_s1")[0] for curr_col in s1.schema.names])
-    dict_val = {}
-    for curr_col in org_col:
-        curr_col_cnt = col_diff_rec.filter(fx.array_contains(fx.col("CompColArr.col_name"), curr_col)).count()
-        dict_val[curr_col] = curr_col_cnt
-
-    # Sort the Dictionary from columns having highest mismatch to lowest and create a dataframe
-    return pd.DataFrame.from_dict(dict_val, orient="index", columns=["count"]).sort_values(by=["count"],
-                                                                                           ascending=False)
-
-
-if __name__ == "__main__":
-    from pyspark.sql import SparkSession, DataFrame
-    from find_datacol_diff import initialise_and_standardise_df, create_join_condition
-
-    # Define input path for testing
-    dataset_pth = "tests/datasets"
-
-    # Create Spark session and load dataframes for testing
-    spark = SparkSession.builder.getOrCreate()
-    emp100 = spark.read.option("header", True).csv(f"{dataset_pth}/employee100.csv")
-    emp101 = spark.read.option("header", True).csv(f"{dataset_pth}/employee101.csv")
-    bible = spark.read.option("header", True).csv(f"{dataset_pth}/bible101.csv")
-    match_schema_df = initialise_and_standardise_df(s1=emp100, s2=emp101)
-    s1_new, s2_new = match_schema_df["s1"], match_schema_df["s2"]
-    join_condition, s1_keys, s2_keys = create_join_condition(s1_new, s2_new, ["id"])
-    analysed_dfs = find_col_diff(s1_new, s2_new, s1_keys, s2_keys, join_condition)
-    dcd.info("Displaying Mismatch Attribute Dataframe")
-    analysed_dfs["attrib_diff"].select(fx.to_json(struct("*"))).show(200, truncate=False)
-    mismatch_counts_df = col_mismatch_counts(emp100,analysed_dfs["attrib_diff"])
-    dcd.info("Printing Mismatch Column Count details")
-    print(tabulate(mismatch_counts_df))
+        dcd.info("Printing Mismatch Column Count details")
+        print(tabulate(col_stats, headers=list(col_stats.columns), tablefmt='psql'))
+    except Exception as exc:
+        # Handle exceptions and return None as values in the dictionary for both s1,s2
+        dcd.error(utils.err_msg(lineno=sys.exc_info()[-1].tb_lineno, exception_object=exc))
+        sys.exit(1)
+    return s1_jn_s2, col_stats

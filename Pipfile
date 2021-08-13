@@ -9,11 +9,13 @@ requests = "*"
 pandas = "*"
 findspark = "*"
 tabulate = "*"
+pytest = "*"
+pytest-html = "*"
+python-dotenv = "*"
 
 [dev-packages]
 pylint = "*"
-pytest = "*"
-pytest-html = "*"
+
 
 [requires]
 python_version = "3.7"
