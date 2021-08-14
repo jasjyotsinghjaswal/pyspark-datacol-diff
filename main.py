@@ -8,11 +8,9 @@ if __name__ == "__main__":
     # Load Environment Variables from .env
     load_dotenv()
 
-    # Define input path for testing
+    # Define input path for testing & Spark Home
     dataset_pth = os.getenv("PROJ_DATASET_DIR")
-
-    # Define input path for testing
-    dataset_pth = "tests/datasets"
+    os.environ["SPARK_HOME"] = os.getenv("PROJ_SPARK_HOME")
 
     # Create Spark session and load dataframes for testing
     spark = SparkSession.builder.getOrCreate()
