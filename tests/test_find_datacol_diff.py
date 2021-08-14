@@ -1,11 +1,13 @@
 """
 Import dependencies for the test
 """
-import pyspark.sql
-from pyspark.sql import SparkSession, DataFrame
-from find_datacol_diff import initialise_and_standardise_df, gen_comp_col
 import os
+
+import pytest
 from dotenv import load_dotenv
+from pyspark.sql import SparkSession, DataFrame
+
+from find_datacol_diff import initialise_and_standardise_df, gen_comp_col, find_col_diff
 
 # Load Environment Variables from .env
 load_dotenv()
