@@ -5,7 +5,7 @@ import os
 VERSION = '0.0.1'
 DESCRIPTION = 'PySpark utility created to quickly provide details regarding which attributes differ between 2 dataframes with same schema and primary key.'
 requires = [
-    'pyspark>=3.0.2',
+    'pyspark>=3.0.2', 'tabulate>=0.8.9'
 ]
 # Setting up
 setup(
