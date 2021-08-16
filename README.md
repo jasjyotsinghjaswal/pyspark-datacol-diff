@@ -6,7 +6,7 @@ PySpark utility created to quickly provide details regarding which attributes di
 
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install utility.
 ```bash
-pip install pyspark-datacol-diff
+pip3 install pyspark-datacol-diff
 ```
 
 ## Examples of How To Use 
@@ -14,6 +14,7 @@ pip install pyspark-datacol-diff
 Importing The Other Dependencies prior to package installation and prepare the input dataframe.
 
 ```python
+from pyspark.sql import functions as fx
 from pyspark.sql.functions import when, col, struct, array
 from pyspark.sql import SparkSession
 
@@ -26,7 +27,7 @@ emp101 = spark.read.option("header", True).csv(f"{dataset_pth}/employee101.csv")
 Import compute_dataframe_diff function and pass the 2 dataframes to compare along with common primary keys.
 ```python
 from pysparkdatacoldiff.find_dataframe_diff import compute_dataframe_diff
-diff_df, diff_cnts = compute_dataframe_diff(s1=emp100,s2=emp101,pk_lst=["id"])
+diff_df, diff_cnts = compute_dataframe_diff(s1=SourceDF1,s2=SourceDF2,pk_lst=[STRING_LIST_OF_PRIMARY_KEY_COLS])
 ```
 You can now use the PySpark Dataframe diff_df to look into records at granular level to find which attributes they differ.
 
@@ -51,5 +52,5 @@ diff_df.filter(fx.array_contains(fx.col("CompColArr.col_name"), YOUR_DESIRED_COL
 
 *YOUR_DESIRED_COLUMN* = Column Name whose mismatches you want to display.
 
-## Watch Below GIF on how to setup and use this utiltiy
+## Watch Below GIF on how to setup and use this utilitiy
 
