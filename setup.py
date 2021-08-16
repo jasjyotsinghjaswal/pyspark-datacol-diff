@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 import codecs
 import os
 
-VERSION = '0.0.3'
+VERSION = '0.0.5'
 DESCRIPTION = 'PySpark utility created to quickly provide details regarding which attributes differ between 2 dataframes with same schema and primary key.'
 requires = [
     'pyspark>=3.0.2', 'tabulate>=0.8.9'
@@ -14,7 +14,7 @@ setup(
     author="Jasjyot Singh Jaswal",
     author_email="<jasjyot_singh_jaswal@yahoo.com>",
     description=DESCRIPTION,
-    packages=find_packages(),
+    packages=['pysparkdatacoldiff','.'],
     install_requires=requires,
     url="https://github.com/jasjyotsinghjaswal/pyspark-datacol-diff",
     license="MIT",
@@ -27,5 +27,6 @@ setup(
         "Operating System :: Unix",
         "Operating System :: MacOS :: MacOS X",
         "Operating System :: Microsoft :: Windows",
-    ]
+    ],
+    include_package_data=True
 )
