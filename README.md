@@ -56,4 +56,4 @@ diff_df.filter(fx.array_contains(fx.col("CompColArr.col_name"), YOUR_DESIRED_COL
 
 https://colab.research.google.com/drive/1HwX3UF5FmzpPMUjuBtnoU-VLTJ1xnWJw?usp=sharing#scrollTo=Rvd1ka4PjQHB
 
-![alt text](https://drive.google.com/file/d/1THv2wzmAhHu-4509n2Pfmu4IvwHA7lIw/view?usp=sharing)
+![alt text](CollabNotebookPySparkDataColDiffExample.png)
