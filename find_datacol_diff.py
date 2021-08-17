@@ -100,8 +100,8 @@ def find_col_diff(s1_new: DataFrame, s2_new: DataFrame, s1_key_lst: List[str], s
         # Iterate all the columns and generate json with keys for differing columns
         for curr_col in comp_col:
             # Expression to coalesce s2 and s2 column before comparison to avoid hiccups
-            s1_coal_col = fx.coalesce(col(curr_col + "_s1"), fx.lit(""))
-            s2_coal_col = fx.coalesce(col(curr_col + "_s2"), fx.lit(""))
+            s1_coal_col = fx.coalesce(col(curr_col + "_s1"), fx.lit("EXVG-PYSPARK-DATACOL-DIFF"))
+            s2_coal_col = fx.coalesce(col(curr_col + "_s2"), fx.lit("EXVG-PYSPARK-DATACOL-DIFF"))
             # Check equality between 2 columns.Populate 1 for mismatch,0 otherwise
             s1_jn_s2 = s1_jn_s2.withColumn("column_eq_test", when(s1_coal_col != s2_coal_col, 1).otherwise(0))
             # Create expressions for keys col_name, col_s1,col_s2 with column name and 2 columns respective values

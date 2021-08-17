@@ -2,10 +2,10 @@ from setuptools import setup, find_packages
 import codecs
 import os
 
-VERSION = '0.0.5'
+VERSION = '0.0.6'
 DESCRIPTION = 'PySpark utility created to quickly provide details regarding which attributes differ between 2 dataframes with same schema and primary key.'
 requires = [
-    'pyspark>=3.0.2', 'tabulate>=0.8.9'
+    'pyspark>=3.0.2', 'tabulate>=0.8.9', 'pandas>=1.0.0'
 ]
 # Setting up
 setup(
