@@ -20,8 +20,8 @@ from pyspark.sql import SparkSession
 
 # Create Spark session and load dataframes for testing
 spark = SparkSession.builder.getOrCreate()
-emp100 = spark.read.option("header", True).csv(f"{dataset_pth}/employee100.csv")
-emp101 = spark.read.option("header", True).csv(f"{dataset_pth}/employee101.csv")
+SourceDF1 = spark.read.option("header", True).csv(f"{dataset_pth}/employee100.csv")
+SourceDF2 = spark.read.option("header", True).csv(f"{dataset_pth}/employee101.csv")
 ```
 
 Import compute_dataframe_diff function and pass the 2 dataframes to compare along with common primary keys.
